@@ -192,7 +192,10 @@ class RestaurantController {
       this.handleNewDishForm,
       this.handleRemoveDishForm,
       this.handleAssignDish,
-      this.handlDesssingDish
+      this.handlDesssingDish,
+      this.handleNewCategory,
+      this.handleRemoveCategoryForm,
+      this.handleNewRestaurantForm
     );
   };
 
@@ -313,6 +316,21 @@ class RestaurantController {
       this[MODEL].getterDishes()
     );
     this[VIEW].bindDesAssignDishForm(this.handleDesAssingDishMenu);
+  };
+
+  handleNewCategory = () => {
+    this[VIEW].showNewCategoryForm();
+    this[VIEW].bindNewCategoryForm(this.handleCreateCategory);
+  };
+
+  handleRemoveCategoryForm = () => {
+    this[VIEW].showRemoveCategoryForm(this[MODEL].getterCategories());
+    this[VIEW].bindRemoveCategoryForm(this.handleRemoveCategory);
+  };
+
+  handleNewRestaurantForm = () => {
+    this[VIEW].showNewRestaurantForm();
+    this[VIEW].bindNewRestauranForm(this.handleCreateRestaurant);
   };
 
   handleCreateDish = (
@@ -452,6 +470,80 @@ class RestaurantController {
 
     // Modal
     this[VIEW].showDesAssignDishModal(done, menuObj, error);
+  };
+
+  handleCreateCategory = (name, description) => {
+    // Creamos la categoria pasandole el nombre
+    const category = this[MODEL].createCategory(name);
+    // Asignamos los demas valores
+    if (description) category.description = description; // Añadimos descripcion
+
+    // Tras realizar los pasos anteriores añadimos las categorias
+    let done;
+    let error;
+
+    try {
+      // Añadimos el plato al array
+      this[MODEL].addCategory(category);
+      this.onAddCategory();
+      // Indicamos que las operaciones se han realizado de manera correcta
+      done = true;
+    } catch (exception) {
+      console.log("estamos aqui");
+      done = false;
+      error = exception;
+    }
+
+    // Mostramos el modal de creacion
+    this[VIEW].showNewCategoryModal(done, category, error);
+  };
+
+  // Eliminación de categoria
+  handleRemoveCategory = (name) => {
+    let done;
+    let error;
+    let category;
+
+    try {
+      category = this[MODEL].createCategory(name);
+      // Borramos la categoria
+      this[MODEL].removeCategory(category);
+      // Actualizamos los datos
+      this.handleRemoveCategoryForm();
+      this.onAddCategory();
+      done = true;
+    } catch (exception) {
+      done = false;
+      error = exception;
+    }
+
+    // Modal
+    this[VIEW].showRemoveCategoryModal(done, category, error);
+  };
+
+  // Creación del resturante
+  handleCreateRestaurant = (name, description) => {
+    // Creamos el restaurante pasandole el nombre
+    const restaurant = this[MODEL].createRestaurant(name);
+    // Asignamos los demas valores la restaurante
+    if (description) restaurant.description = description; // Añadimos descripcion
+
+    let done;
+    let error;
+
+    try {
+      // Añadimos el plato al array
+      this[MODEL].addRestaurant(restaurant);
+      this.onAddRestaurant();
+      // Indicamos que las operaciones se han realizado de manera correcta
+      done = true;
+    } catch (exception) {
+      done = false;
+      error = exception;
+    }
+
+    // Modal
+    this[VIEW].showNewRestaurantModal(done, restaurant, error);
   };
 }
 

@@ -269,3 +269,127 @@ export function desAssignValidationForm(handler) {
     this.ndMenus.focus();
   });
 }
+
+// Creamos el metodo con el que validaremos la categoria del formualario
+export function newCategoryValidationForm(handler) {
+  // Obtenemos el formulario que vamos a validar
+  const form = document.forms.fNewCategory;
+  form.setAttribute("novalidate", true);
+
+  // Evento para cuando pulsemos el boton de enviar
+  // realizamos la validadcion de todos los datos
+  form.addEventListener("submit", function (event) {
+    // Creamos las variables necesarias
+    let isValid = true; // Variable booleana donde indicaremos si los valores son validos
+    let firstInvalidElement = null;
+
+    // Validamos el nombre
+    if (!this.ndCategoryName.checkValidity()) {
+      isValid = false;
+      showFeedBack(this.ndCategoryName, false);
+      firstInvalidElement = this.ndCategoryName;
+    } else {
+      showFeedBack(this.ndCategoryName, true);
+    }
+
+    // Validamos la descripcion
+    if (!this.ndCategoryDescription.checkValidity()) {
+      isValid = false;
+      showFeedBack(this.ndCategoryDescription, false);
+      firstInvalidElement = this.ndCategoryDescription;
+    } else {
+      showFeedBack(this.ndCategoryDescription, true);
+    }
+
+    if (!isValid) {
+      firstInvalidElement.focus();
+    } else {
+      // Le pasamos a nuestro handler todos los valores para la creacion del plato
+      handler(this.ndCategoryName.value, this.ndCategoryDescription.value);
+    }
+
+    // Quitamos los valores por defecto
+    event.preventDefault();
+    event.stopPropagation();
+  });
+
+  // Evento para cuando pulsemos el boton de cancelar
+  form.addEventListener("reset", function (event) {
+    for (const div of this.querySelectorAll(
+      "div.valid-feedback, div.invalid-feedback"
+    )) {
+      div.classList.remove("d-block");
+      div.classList.add("d-none");
+    }
+    for (const input of this.querySelectorAll("input")) {
+      input.classList.remove("is-valid");
+      input.classList.remove("is-invalid");
+    }
+    this.ndCategoryName.focus();
+  });
+
+  form.ndCategoryName.addEventListener("change", defaultCheckElement);
+  form.ndCategoryDescription.addEventListener("change", defaultCheckElement);
+}
+
+// Creamos el metodo con el que validaremos el restaurante del formualario
+export function newRestaurantValidationForm(handler) {
+  // Obtenemos el formulario que vamos a validar
+  const form = document.forms.fNewRestaurant;
+  form.setAttribute("novalidate", true);
+
+  // Evento para cuando pulsemos el boton de enviar
+  // realizamos la validadcion de todos los datos
+  form.addEventListener("submit", function (event) {
+    // Creamos las variables necesarias
+    let isValid = true; // Variable booleana donde indicaremos si los valores son validos
+    let firstInvalidElement = null;
+
+    // Validamos el nombre
+    if (!this.ndResName.checkValidity()) {
+      isValid = false;
+      showFeedBack(this.ndResName, false);
+      firstInvalidElement = this.ndResName;
+    } else {
+      showFeedBack(this.ndResName, true);
+    }
+
+    // Validamos la descripcion
+    if (!this.ndResDescription.checkValidity()) {
+      isValid = false;
+      showFeedBack(this.ndResDescription, false);
+      firstInvalidElement = this.ndResDescription;
+    } else {
+      showFeedBack(this.ndResDescription, true);
+    }
+
+    if (!isValid) {
+      firstInvalidElement.focus();
+    } else {
+      // Le pasamos a nuestro handler todos los valores para la creacion del plato
+      handler(this.ndResName.value, this.ndResDescription.value);
+    }
+
+    // Quitamos los valores por defecto
+    event.preventDefault();
+    event.stopPropagation();
+  });
+
+  // Evento para cuando pulsemos el boton de cancelar
+  form.addEventListener("reset", function (event) {
+    for (const div of this.querySelectorAll(
+      "div.valid-feedback, div.invalid-feedback"
+    )) {
+      div.classList.remove("d-block");
+      div.classList.add("d-none");
+    }
+    for (const input of this.querySelectorAll("input")) {
+      input.classList.remove("is-valid");
+      input.classList.remove("is-invalid");
+    }
+    this.ndResName.focus();
+  });
+
+  form.ndResName.addEventListener("change", defaultCheckElement);
+  form.ndResDescription.addEventListener("change", defaultCheckElement);
+}

@@ -4,6 +4,8 @@ import {
   newDishValidation,
   assignValidationForm,
   desAssignValidationForm,
+  newCategoryValidationForm,
+  newRestaurantValidationForm,
 } from "./validation.js";
 // Definimos Symbol para implementar el método
 const EXCECUTE_HANDLER = Symbol("excecuteHandler");
@@ -623,7 +625,7 @@ data-serial="${
     suboptions.classList.add("dropdown-menu");
     suboptions.insertAdjacentHTML(
       "beforeend",
-      '<li><a id="newCategory" class="dropdown-item" href="#new-category">Crear Plato</a></li>'
+      '<li><a id="newDish" class="dropdown-item" href="#newDish">Crear Plato</a></li>'
     );
     suboptions.insertAdjacentHTML(
       "beforeend",
@@ -639,11 +641,15 @@ data-serial="${
     );
     suboptions.insertAdjacentHTML(
       "beforeend",
-      '<li><a id="newRemoveCategory" class="dropdown-item" href="#del-product">Añadir-Borrar Categoria</a></li>'
+      '<li><a id="newCategory" class="dropdown-item" href="#newCategory">Crear Categoria</a></li>'
     );
     suboptions.insertAdjacentHTML(
       "beforeend",
-      '<li><a id="newRestaurant" class="dropdown-item" href="#del-product">Crear Restaurante</a></li>'
+      '<li><a id="deleteCategory" class="dropdown-item" href="#deleteCategory">Borrar Categoria</a></li>'
+    );
+    suboptions.insertAdjacentHTML(
+      "beforeend",
+      '<li><a id="newRestaurant" class="dropdown-item" href="#newRestaurant">Crear Restaurante</a></li>'
     );
     suboptions.insertAdjacentHTML(
       "beforeend",
@@ -1068,14 +1074,178 @@ data-serial="${
     }
   }
 
-  bindAdminMenu(newDish, removeDish, assignDish, desssingDish) {
-    const newDishLink = document.getElementById("newCategory");
+  showNewCategoryForm() {
+    // Primero borraremos el contenido del main
+    this.categories.replaceChildren();
+    this.main.replaceChildren();
+    if (this.categories.children.length > 1)
+      this.categories.children[1].remove();
+
+    // Creamos el div donde ira nuestro formulario de creacion del plato
+    const container = document.createElement("div");
+
+    // Le añadimos las clases y las ids correspondientes a nuestro contenedor
+    container.classList.add("container", "my-3");
+    container.id = "new-category";
+
+    // Le añadimos el titulo a nuestro contenedor
+    container.insertAdjacentHTML("afterbegin", "<h1>Nuevo Categoria</h1>");
+
+    // Añadimos el formulario para la creacion del plato a nuestro contenedor
+    container.insertAdjacentHTML(
+      "beforeend",
+      `     
+      <form name="fNewCategory" role="form" id="fNewCategory" class="booking_frm black"  novalidate> 
+        <h2 class="frm_title">Creación Categoria</>
+        <h3 class="frm_subtitle">Rellene los campos con la información necesaria para la creación de la categoria.</h3>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndCategoryName">Nombre <span class="letter_red">*</span></label>
+            <input class="input-style type="text" id="ndCategoryName" name="ndCategoryName"
+            placeholder="Introduzca el nombre de la categoria" value="" required/>
+            <div class="invalid-feedback">La categoria debe contener un nombre.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndCategoryDescription">Descripción <span class="letter_red">*</span></label>
+            <input class="input-style type="text" id="ndCategoryDescription" name="ndCategoryDescription"
+            placeholder="Introduzca la descripcion de la categoria" value="" required/>
+            <div class="invalid-feedback">La categoria debe contener una descripción.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <button class="button red" type="submit">Enviar</button>
+          <button class="button red" type="reset">Cancelar</button>
+        </div>
+      </form>
+      `
+    );
+    this.main.append(container);
+  }
+
+  // Metodo con el que eliminaremos nuestras categorias
+  showRemoveCategoryForm(categories) {
+    // Primero borraremos el contenido del main
+    this.categories.replaceChildren();
+    this.main.replaceChildren();
+    if (this.categories.children.length > 1)
+      this.categories.children[1].remove();
+
+    // Creamos el div donde ira nuestro formulario de creacion del plato
+    const container = document.createElement("div");
+
+    // Le añadimos las clases y las ids correspondientes a nuestro contenedor
+    container.classList.add("container", "my-3", "row");
+    container.id = "del-category";
+
+    // Le añadimos el titulo a nuestro contenedor
+    container.insertAdjacentHTML(
+      "afterbegin",
+      "<h1>Eliminacion de categoria</h1>"
+    );
+
+    for (const category of categories) {
+      // Añadimos las categorias a nuestro contenedor
+      container.insertAdjacentHTML(
+        "beforeend",
+        `     
+          <div class="card black rounded-3 mt-20 style-card">${category.name}
+            <div class="card-body text-center">
+                <p class="card-text text-white">${category.name}</p>
+            </div>
+            <div class="mx-auto mt-4 mb-4 fs-6">
+              <a  href='#' class="btn button red" data-category="${category.name}" type="button">
+                Eliminar
+              </a>
+            </div>
+          </div>
+        `
+      );
+    }
+
+    // Añadimos el formulario a nuestra pagina
+    this.main.append(container);
+  }
+
+  showNewRestaurantForm() {
+    // Primero borraremos el contenido del main
+    this.categories.replaceChildren();
+    this.main.replaceChildren();
+    if (this.categories.children.length > 1)
+      this.categories.children[1].remove();
+
+    // Creamos el div donde ira nuestro formulario de creacion del plato
+    const container = document.createElement("div");
+
+    // Le añadimos las clases y las ids correspondientes a nuestro contenedor
+    container.classList.add("container", "my-3");
+    container.id = "new-restaurant";
+
+    // Le añadimos el titulo a nuestro contenedor
+    container.insertAdjacentHTML("afterbegin", "<h1>Nuevo Restaurante</h1>");
+
+    // Añadimos el formulario para la creacion del plato a nuestro contenedor
+    container.insertAdjacentHTML(
+      "beforeend",
+      `     
+      <form name="fNewRestaurant" role="form" id="fNewRestaurant" class="booking_frm black" novalidate> 
+        <h2 class="frm_title">Creación Restaurante</>
+        <h3 class="frm_subtitle">Rellene los campos con la información necesaria para la creación del restaurante.</h3>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndResName">Nombre <span class="letter_red">*</span></label>
+            <input class="input-style type="text" id="ndResName" name="ndResName"
+            placeholder="Introduzca el nombre del restaurante" value="" required/>
+            <div class="invalid-feedback">El restaurante debe contener un nombre.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndResDescription">Descripción <span class="letter_red">*</span></label>
+            <input class="input-style type="text" id="ndResDescription" name="ndResDescription"
+            placeholder="Introduzca la descripcion del restaurante" value="" required/>
+            <div class="invalid-feedback">El restaurante debe contener una descripción.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <button class="button red" type="submit">Enviar</button>
+          <button class="button red" type="reset">Cancelar</button>
+        </div>
+      </form>
+      `
+    );
+
+    // Añadimos el formulario a nuestra pagina
+    this.main.append(container);
+  }
+
+  bindAdminMenu(
+    newDish,
+    removeDish,
+    assignDish,
+    desssingDish,
+    newCategory,
+    deleteCat,
+    newRestaurant
+  ) {
+    const newDishLink = document.getElementById("newDish");
     newDishLink.addEventListener("click", (event) => {
       this[EXCECUTE_HANDLER](
         newDish,
         [],
-        "#new-category",
-        { action: "newCategory" },
+        "#newDish",
+        { action: "newDish" },
         "#",
         event
       );
@@ -1112,6 +1282,42 @@ data-serial="${
         [],
         "#desAssignDish",
         { action: "desAssignDish" },
+        "#",
+        event
+      );
+    });
+
+    const createCategory = document.getElementById("newCategory");
+    createCategory.addEventListener("click", (event) => {
+      this[EXCECUTE_HANDLER](
+        newCategory,
+        [],
+        "#newCategory",
+        { action: "newCategory" },
+        "#",
+        event
+      );
+    });
+
+    const deleteCategory = document.getElementById("deleteCategory");
+    deleteCategory.addEventListener("click", (event) => {
+      this[EXCECUTE_HANDLER](
+        deleteCat,
+        [],
+        "#deleteCategory",
+        { action: "deleteCategory" },
+        "#",
+        event
+      );
+    });
+
+    const createRestaurant = document.getElementById("newRestaurant");
+    createRestaurant.addEventListener("click", (event) => {
+      this[EXCECUTE_HANDLER](
+        newRestaurant,
+        [],
+        "#newRestaurant",
+        { action: "newRestaurant" },
         "#",
         event
       );
@@ -1161,6 +1367,17 @@ data-serial="${
     }
   }
 
+  // Vinculamos el manejador a los botones de eliminar de las categorias
+  bindRemoveCategoryForm(handler) {
+    const container = document.getElementById("del-category");
+    const buttons = container.getElementsByTagName("a");
+    for (const button of buttons) {
+      button.addEventListener("click", function (event) {
+        handler(this.dataset.category);
+      });
+    }
+  }
+
   bindNewDishForm(handler) {
     newDishValidation(handler);
   }
@@ -1171,6 +1388,14 @@ data-serial="${
 
   bindDesAssignDishForm(handler) {
     desAssignValidationForm(handler);
+  }
+
+  bindNewCategoryForm(handler) {
+    newCategoryValidationForm(handler);
+  }
+
+  bindNewRestauranForm(handler) {
+    newRestaurantValidationForm(handler);
   }
 
   // MODALES
@@ -1309,6 +1534,88 @@ data-serial="${
       );
     }
     messageModal.show();
+  }
+
+  showNewCategoryModal(done, cate, error) {
+    const messageModalContainer = document.getElementById("messageModal");
+    const messageModal = new bootstrap.Modal("#messageModal");
+
+    const title = document.getElementById("messageModalTitle");
+    title.innerHTML = "Categoria creada";
+    const body = messageModalContainer.querySelector(".modal-body");
+    body.replaceChildren();
+    if (done) {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="p-3">La categoria <strong>${cate.name}</strong> ha sido creada correctamente.</div>`
+      );
+    } else {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="error text-danger p-3"><i class="bi bi-exclamation-triangle"></i> La categoria <strong>${cate.name}</strong> no ha podido crearse correctamente.</div>`
+      );
+    }
+    messageModal.show();
+    const listener = (event) => {
+      if (done) {
+        document.fNewCategory.reset();
+      }
+      document.fNewCategory.ndCategoryName.focus();
+    };
+    messageModalContainer.addEventListener("hidden.bs.modal", listener, {
+      once: true,
+    });
+  }
+  showRemoveCategoryModal(done, cat, error) {
+    const messageModalContainer = document.getElementById("messageModal");
+    const messageModal = new bootstrap.Modal("#messageModal");
+
+    const title = document.getElementById("messageModalTitle");
+    title.innerHTML = "Categoria eliminada";
+    const body = messageModalContainer.querySelector(".modal-body");
+    body.replaceChildren();
+    if (done) {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="p-3">La categoria <strong>${cat.name}</strong> ha sido eliminado correctamente.</div>`
+      );
+    } else {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        '<div class="error text-danger p-3"><i class="bi bi-exclamation-triangle"></i> La categoria no existe en el manager.</div>'
+      );
+    }
+    messageModal.show();
+  }
+  showNewRestaurantModal(done, res, error) {
+    const messageModalContainer = document.getElementById("messageModal");
+    const messageModal = new bootstrap.Modal("#messageModal");
+
+    const title = document.getElementById("messageModalTitle");
+    title.innerHTML = "Restaurante creado";
+    const body = messageModalContainer.querySelector(".modal-body");
+    body.replaceChildren();
+    if (done) {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="p-3">El restaurante <strong>${res.name}</strong> ha sido creada correctamente.</div>`
+      );
+    } else {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="error text-danger p-3"><i class="bi bi-exclamation-triangle"></i>El restaurante <strong>${res.name}</strong> no ha podido crearse correctamente.</div>`
+      );
+    }
+    messageModal.show();
+    const listener = (event) => {
+      if (done) {
+        document.fNewRestaurant.reset();
+      }
+      document.fNewRestaurant.ndResName.focus();
+    };
+    messageModalContainer.addEventListener("hidden.bs.modal", listener, {
+      once: true,
+    });
   }
 }
 
