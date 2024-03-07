@@ -41,7 +41,32 @@ const historyActions = {
 
   dishBind: (event) => RestaurantApp.handleDishInformation(event.state.dish),
 
-  formNewDish: (event) => RestaurantApp.handleNewDishForm(),
+  newDish: (event) => RestaurantApp.handleNewDishForm(),
+
+  removeDish: (event) => RestaurantApp.handleRemoveDishForm(),
+
+  removeDishByAllergen: (event) => {
+    RestaurantApp.handleRemoveDishByAllergens(event.state.allergen);
+  },
+  removeDishByCategory: (event) => {
+    RestaurantApp.handleRemoveDishByCategory(event.state.category);
+  },
+  assignDish: () => {
+    RestaurantApp.handleAssignDish();
+  },
+  desAssignDish: () => {
+    RestaurantApp.handlDesssingDish();
+  },
+  newCategory: () => {
+    RestaurantApp.handleNewCategory();
+  },
+  newRestaurant: () => {
+    RestaurantApp.handleNewRestaurantForm();
+  },
+
+  newRestaurant: () => {
+    RestaurantApp.handleNewRestaurantForm();
+  },
 };
 
 // Reemplaza el estado actual en la historia del navegador con un nuevo estado ('init' en este caso)

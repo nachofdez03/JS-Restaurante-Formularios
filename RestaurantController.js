@@ -359,15 +359,15 @@ class RestaurantController {
       this[MODEL].addDish(newDish);
       console.log("lo añade?");
 
-      categories.foreach((name) => {
+      categories.forEach((name) => {
         const category = this[MODEL].createCategory(name);
 
-        this[MODEL].assignCategoryToDish(category, newDish);
+        this[MODEL].assignCategoryToDish(newDish, category);
       });
 
-      allergens.foreach((name) => {
+      allergens.forEach((name) => {
         const allergen = this[MODEL].createAllergen(name);
-        this[MODEL].assignAllergenToDish(name, newDish);
+        this[MODEL].assignAllergenToDish(newDish, allergen);
 
         // Asignamos que todo fue correctamente
         done = true;
@@ -396,7 +396,7 @@ class RestaurantController {
 
       // Eliminamos el plato
       this[MODEL].removeDish(dish);
-      console.log("has");
+      this.handleRemoveDishForm();
 
       // Indicamos que la operacion se ha cumplido
       done = true;
