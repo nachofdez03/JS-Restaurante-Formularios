@@ -27,6 +27,7 @@ class RestaurantController {
     this.onAddAllergen();
     this.onAddMenu();
     this.onAddRestaurant();
+    this.onAddform();
 
     this[VIEW].bindInit(this.handleInit); // El Onit de antes para cuando se reinicie, y aqui para cuando se le da
   }
@@ -152,18 +153,19 @@ class RestaurantController {
   // Ahora creamos un método de aplicación que estará en el constructor, se invocará con cada recarga
   onLoad = () => {
     this[LOAD_RESTAURANT_OBJECTS]();
+    this[VIEW].showCategoriesinMenu(this[MODEL].getterCategories()); // Mostrara las categorias en el menu del nav
+    this[VIEW].showAllergensinMenu(this[MODEL].getterAllergens());
+    this[VIEW].showMenusinMenu(this[MODEL].getterMenus());
+    this[VIEW].showRestaurantsinMenu(this[MODEL].getterRestaurants());
+    this[VIEW].showAdminMenu();
   };
 
   // Ejecutará los métodos de la Vista, se invocará con reinicio de la aplicación o con petición del usuario
   // Evento
   onInit = () => {
-    this[VIEW].showCategoriesinMenu(this[MODEL].getterCategories()); // Mostrara las categorias en el menu del nav
     this[VIEW].showCategories(this[MODEL].getterCategories()); // Mostrará las imagenes al cargarse la página
     this[VIEW].RandomDishes(this[MODEL].getterDishes()); // Mostrará los platos random del menu
     this[VIEW].bindShowRandomDish(this.handleDishInformation);
-    this[VIEW].showAllergensinMenu(this[MODEL].getterAllergens());
-    this[VIEW].showMenusinMenu(this[MODEL].getterMenus());
-    this[VIEW].showRestaurantsinMenu(this[MODEL].getterRestaurants());
   };
 
   // Se ejecuta cuando se pulse una categoria
@@ -184,6 +186,16 @@ class RestaurantController {
   onAddRestaurant = () => {
     this[VIEW].bindRestaurantsDishesMenu(this.handleRestaurant);
   };
+
+  onAddform = () => {
+    this[VIEW].bindAdminMenu(
+      this.handleNewDishForm,
+      this.handleRemoveDishForm,
+      this.handleAssignDish,
+      this.handlDesssingDish
+    );
+  };
+
   // Manejador
   handleInit = () => {
     this.onInit();
@@ -251,6 +263,195 @@ class RestaurantController {
     const dish = this[MODEL].getDish(dishName);
     this[VIEW].showProductInNewWindow(dish);
     this[VIEW].closeWindow();
+  };
+
+  handleNewDishForm = () => {
+    this[VIEW].showNewDishForm(
+      this[MODEL].getterCategories(),
+      this[MODEL].getterAllergens()
+    );
+
+    this[VIEW].bindNewDishForm(this.handleCreateDish);
+  };
+
+  handleRemoveDishForm = () => {
+    this[VIEW].showRemoveDish(
+      this[MODEL].getterCategories(),
+      this[MODEL].getterAllergens()
+    );
+    this[VIEW].bindRemoveDishSelect(
+      this.handleRemoveDishByAllergens,
+      this.handleRemoveDishByCategory
+    );
+  };
+
+  // Manejador para eliminar por categorias
+  handleRemoveDishByCategory = (name) => {
+    const category = this[MODEL].createCategory(name);
+    this[VIEW].showRemoveDishList(this[MODEL].getDishesInCategory(category));
+    this[VIEW].bindRemoveDish(this.handleRemoveDish);
+  };
+
+  // Manejador para eliminar por alergenos
+  handleRemoveDishByAllergens = (name) => {
+    const allergen = this[MODEL].createAllergen(name);
+    this[VIEW].showRemoveDishList(this[MODEL].getDishesWithAllergen(allergen));
+    this[VIEW].bindRemoveDish(this.handleRemoveDish);
+  };
+
+  handleAssignDish = () => {
+    this[VIEW].showAssignDishForm(
+      this[MODEL].getterMenus(),
+      this[MODEL].getterDishes()
+    );
+    this[VIEW].bindAssignDishForm(this.handleAssignDishMenu);
+  };
+
+  handlDesssingDish = () => {
+    this[VIEW].showDesAssignDishForm(
+      this[MODEL].getterMenus(),
+      this[MODEL].getterDishes()
+    );
+    this[VIEW].bindDesAssignDishForm(this.handleDesAssingDishMenu);
+  };
+
+  handleCreateDish = (
+    name,
+    description,
+    ingredients,
+    categories,
+    allergens
+  ) => {
+    // Creamos nuestro plato pasandole el nombre
+    const newDish = this[MODEL].createDish(name);
+
+    // Asignamos los demas valores al plato si estos existen
+    if (description) newDish.description = description; // Añadimos descripcion
+
+    // Pasamos la cadena de texto con los ingredientes a array y se lo añadimos a nuestro plato
+    if (ingredients) newDish.ingredients = ingredients.split(",");
+
+    let done;
+    let error;
+
+    // Ahora asignamos los alergenos y categorias al plato
+
+    try {
+      // Añadimos el plato lo primero de todo
+      this[MODEL].addDish(newDish);
+      console.log("lo añade?");
+
+      categories.foreach((name) => {
+        const category = this[MODEL].createCategory(name);
+
+        this[MODEL].assignCategoryToDish(category, newDish);
+      });
+
+      allergens.foreach((name) => {
+        const allergen = this[MODEL].createAllergen(name);
+        this[MODEL].assignAllergenToDish(name, newDish);
+
+        // Asignamos que todo fue correctamente
+        done = true;
+      });
+    } catch (exeption) {
+      // Si ha salido mal
+
+      done = false;
+      error = exeption;
+    }
+
+    this[VIEW].showDishModal(done, newDish, error);
+  };
+
+  // Manejador para la elimiacion del plato
+  handleRemoveDish = (name) => {
+    // Declaramos las variables de nuestro handler
+    let done;
+    let error;
+    let dish;
+
+    // Intentamos le borrado del plato
+    try {
+      // Obtenemos el plato que quremos eliminar
+      dish = this[MODEL].createDish(name);
+
+      // Eliminamos el plato
+      this[MODEL].removeDish(dish);
+      console.log("has");
+
+      // Indicamos que la operacion se ha cumplido
+      done = true;
+    } catch (exception) {
+      done = false;
+      error = exception;
+    }
+
+    // Llamamos a nuestro modal para mostrarle el resultado al ususario
+    this[VIEW].showRemoveDishModal(done, dish, error);
+  };
+
+  // Asignacion de platos a menu
+  handleAssignDishMenu = (menuName, dishes) => {
+    // Declaramos las variables de nuestro handler
+    let done;
+    let error;
+    let dishObj;
+    let menuObj;
+
+    try {
+      // Recogemos el menu
+      menuObj = this[MODEL].createMenu(menuName);
+
+      // Iteramos sobre los platos y se lo asignamos al menu
+      for (const dish of dishes) {
+        // Recogemos el plato
+        dishObj = this[MODEL].createDish(dish);
+
+        // Asignamos el plato al menu
+        this[MODEL].assignDishToMenu(menuObj, dishObj);
+      }
+
+      // Indicamos que la operacion se ha cumplido
+      done = true;
+    } catch (exception) {
+      done = false;
+      error = exception;
+    }
+
+    // Modal
+    this[VIEW].showAssignDishModal(done, menuObj, error);
+  };
+
+  handleDesAssingDishMenu = (menuName, dishes) => {
+    // Declaramos las variables de nuestro handler
+    let done;
+    let error;
+    let dishObj;
+    let menuObj;
+
+    try {
+      // Recogemos el menu
+      menuObj = this[MODEL].createMenu(menuName);
+
+      // Iteramos sobre los platos y se lo asignamos al menu
+      for (const dish of dishes) {
+        // Recogemos el plato
+        dishObj = this[MODEL].createDish(dish.name);
+
+        // Asignamos el plato al menu
+        this[MODEL].deassignDishToMenu(menuObj, dishObj);
+      }
+
+      // Indicamos que la operacion se ha cumplido
+      done = true;
+    } catch (exception) {
+      done = false;
+      error = exception;
+    }
+
+    // Modal
+    this[VIEW].showDesAssignDishModal(done, menuObj, error);
   };
 }
 

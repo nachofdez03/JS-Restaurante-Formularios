@@ -36,6 +36,12 @@ class Dish {
   set name(newName) {
     this.#name = newName;
   }
+  set description(newDescription) {
+    this.#description = newDescription;
+  }
+  set ingredients(newIngredients) {
+    this.#ingredients = newIngredients;
+  }
 }
 
 // Clase Category

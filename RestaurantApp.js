@@ -40,6 +40,8 @@ const historyActions = {
     RestaurantApp.handleRestaurant(event.state.restaurant),
 
   dishBind: (event) => RestaurantApp.handleDishInformation(event.state.dish),
+
+  formNewDish: (event) => RestaurantApp.handleNewDishForm(),
 };
 
 // Reemplaza el estado actual en la historia del navegador con un nuevo estado ('init' en este caso)

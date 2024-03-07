@@ -41,7 +41,7 @@
       </nav>
     </header>
 
-    <main class="main">
+    <main class="main" id="main">
       <div>
         <img class="main__image" src="./Multimedia/PizzaRecortada.png" />
       </div>
@@ -106,5 +106,38 @@
     </footer>
     <script src="Fichero.js"></script>
     <script type="module" src="RestaurantApp.js"></script>
+    <div
+      class="modal fade"
+      id="messageModal"
+      data-bs-backdrop="static"
+      databs-keyboard="false"
+      tabindex="-1"
+      aria-labelledby="messageModalTitle"
+      aria-hidden="true"
+    >
+      <div class="modal-dialog modal-dialog-centered modal-dialogscrollable">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h1 class="modal-title fs-5" id="messageModalTitle">Modal title</h1>
+            <button
+              type="button"
+              class="btn-close"
+              data-bsdismiss="modal"
+              aria-label="Close"
+            ></button>
+          </div>
+          <div class="modal-body">...</div>
+          <div class="modal-footer">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              data-bsdismiss="modal"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

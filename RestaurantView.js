@@ -1,11 +1,17 @@
 // VISTA
 
+import {
+  newDishValidation,
+  assignValidationForm,
+  desAssignValidationForm,
+} from "./validation.js";
 // Definimos Symbol para implementar el método
 const EXCECUTE_HANDLER = Symbol("excecuteHandler");
 
 // Creamos la clase, declaramos las propiedades que vamos a utilizar más habitualmente
 class RestaurantView {
   constructor() {
+    this.main = document.getElementById("main");
     this.dishh = document.getElementById("dish");
     this.menu = document.querySelector(".lista.nav__lista"); // Menu de navegacion
     this.categories = document.getElementById("categories");
@@ -602,6 +608,707 @@ data-serial="${
         }
       }
     });
+  }
+
+  showAdminMenu() {
+    const menuOption = document.createElement("li");
+    menuOption.classList.add("nav-item");
+    menuOption.classList.add("dropdown");
+    menuOption.insertAdjacentHTML(
+      "afterbegin",
+      '<a class="nav-link dropdown-toggle" href="#" id="navServices" role="button" data-bs-toggle="dropdown" aria-expanded="false">Adminitración</a>'
+    );
+
+    const suboptions = document.createElement("ul");
+    suboptions.classList.add("dropdown-menu");
+    suboptions.insertAdjacentHTML(
+      "beforeend",
+      '<li><a id="newCategory" class="dropdown-item" href="#new-category">Crear Plato</a></li>'
+    );
+    suboptions.insertAdjacentHTML(
+      "beforeend",
+      '<li><a id="removeDish" class="dropdown-item" href="#remove-dish">Eliminar Plato</a></li>'
+    );
+    suboptions.insertAdjacentHTML(
+      "beforeend",
+      '<li><a id="assignDish" class="dropdown-item" href="#assignDish">Asignar Platos Menu</a></li>'
+    );
+    suboptions.insertAdjacentHTML(
+      "beforeend",
+      '<li><a id="desAssignDish" class="dropdown-item" href="#desAssignDish"> Desasignar Platos Menu</a></li>'
+    );
+    suboptions.insertAdjacentHTML(
+      "beforeend",
+      '<li><a id="newRemoveCategory" class="dropdown-item" href="#del-product">Añadir-Borrar Categoria</a></li>'
+    );
+    suboptions.insertAdjacentHTML(
+      "beforeend",
+      '<li><a id="newRestaurant" class="dropdown-item" href="#del-product">Crear Restaurante</a></li>'
+    );
+    suboptions.insertAdjacentHTML(
+      "beforeend",
+      '<li><a id="modCategoryDish" class="dropdown-item" href="#del-product">Modificar Cateogrias Plato</a></li>'
+    );
+
+    menuOption.append(suboptions);
+    this.menu.append(menuOption);
+  }
+
+  showNewDishForm(categories, allergens) {
+    this.categories.replaceChildren();
+    this.main.replaceChildren();
+    if (this.categories.children.length > 1)
+      this.categories.children[1].remove();
+
+    // Creamos el div donde ira nuestro formulario de creacion del plato
+    const container = document.createElement("div");
+
+    // Le añadimos las clases y las ids correspondientes a nuestro contenedor
+    container.classList.add("container", "my-3");
+    container.id = "new-dish";
+
+    // Le añadimos el titulo a nuestro contenedor
+    container.insertAdjacentHTML("afterbegin", "<h1>Nuevo Plato</h1>");
+
+    // Añadimos el formulario para la creacion del plato a nuestro contenedor
+    container.insertAdjacentHTML(
+      "beforeend",
+      `     
+       <form name="fNewDish" role="form" id="fNewDish" class="booking_frm black"  novalidate> 
+         <h2 class="frm_title">Creación Del Plato</>
+         
+ 
+         <div class="mt-4">
+           <div class="input-group">
+             <label for="ndName">Nombre <span class="letter_red">*</span></label>
+             <input class="input-style type="text" id="ndName" name="ndName"
+             placeholder="Introduzca el nombre del plato" value="" required/>
+             <div class="invalid-feedback">El plato debe contener un nombre.</div>
+             <div class="valid-feedback">Correcto.</div>
+           </div>
+         </div>
+ 
+         <div class="mt-4">
+           <div class="input-group">
+             <label for="ndDescription">Descripción <span class="letter_red">*</span></label>
+             <input class="input-style type="text" id="ndDescription" name="ndDescription"
+             placeholder="Introduzca la descripcion del plato" value="" required/>
+             <div class="invalid-feedback">El plato debe contener una descripción.</div>
+             <div class="valid-feedback">Correcto.</div>
+           </div>
+         </div>
+ 
+         <div class="mt-4">
+           <div class="input-group">
+             <label for="ndIngredients">Ingredientes <span class="letter_red">*</span></label>
+             <input class="input-style type="text" id="ndIngredients" name="ndIngredients"
+             placeholder="Introducza los ingredientes (ingre1,ingre2)" pattern="^[a-zA-Z0-9]+(?:,[a-zA-Z0-9]+)*$" value="" required/>
+             <div class="invalid-feedback">El plato debe tener ingredientes.</div>
+             <div class="valid-feedback">Correcto.</div>
+           </div>
+         </div>
+ 
+         <div class="mt-4">
+           <div class="input-group">
+             <label for="ndCategories">Categorias <span class="letter_red">*</span></label>
+             <select class="input-style" id="ndCategories" name="ndCategories" size="3" multiple required>
+             </select>
+             <div class="invalid-feedback">Debe seleccionar al menos una categoria.</div>
+             <div class="valid-feedback">Correcto.</div>
+           </div>
+         </div>
+ 
+         <div class="mt-4">
+           <div class="input-group">
+             <label for="ndAllergens">Alergenos <span class="letter_red">*</span></label>
+             <select class="input-style" id="ndAllergens" name="ndAllergens" size="4" multiple required>
+             </select>
+             <div class="invalid-feedback">Debe seleccionar al menos un alergeno.</div>
+             <div class="valid-feedback">Correcto.</div>
+           </div>
+         </div>
+ 
+         <div class="mt-4">
+           <button class="button red" type="submit">Enviar</button>
+           <button class="button red" type="reset">Cancelar</button>
+         </div>
+       </form>
+       `
+    );
+
+    // Añadimos el formulario a nuestra pagina
+    this.main.append(container);
+
+    // Vamos a poner los alergenos y categorias
+    const allergensSelector = document.getElementById("ndAllergens");
+    console.log(allergensSelector);
+
+    for (const allergen of allergens) {
+      allergensSelector.insertAdjacentHTML(
+        "beforeend",
+        `
+          <option value='${allergen.name}'>${allergen.name}</option>
+        `
+      );
+    }
+
+    // Obtenemos el selector donde iran nuestras categorias
+    const categoySelector = document.getElementById("ndCategories");
+
+    // Recorremos las categorias y las añadimos a nuestro selector de categorias
+    for (const category of categories) {
+      categoySelector.insertAdjacentHTML(
+        "beforeend",
+        `
+          <option value='${category.name}'>${category.name}</option>
+        `
+      );
+    }
+  }
+
+  // Formulario para mostrar que plato queremos borrar
+  showRemoveDish(categories, allergens) {
+    // Primero lo que tenemos que hacer es borrar el contenido del main
+    this.categories.replaceChildren();
+    this.main.replaceChildren();
+    if (this.categories.children.length > 1)
+      this.categories.children[1].remove();
+
+    // Creamos el div donde ira nuestro formulario de creacion del plato
+    const container = document.createElement("div");
+
+    // Le añadimos las clases y las ids correspondientes a nuestro contenedor
+    container.classList.add("container", "my-3");
+    container.id = "remove-dish";
+
+    // Le añadimos el titulo a nuestro contenedor
+    container.insertAdjacentHTML("afterbegin", "<h1>Eliminar Plato</h1>");
+
+    container.insertAdjacentHTML(
+      "beforeend",
+      `     
+      <form name="fRemoveDish" role="form" id="fRemoveDish" class="booking_frm black"  novalidate> 
+        <h2 class="frm_title">Eliminación de platos</>
+        <h3 class="frm_subtitle">Rellene los campos con la información necesaria para la eliminacion del plato.</h3>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndCategories">Categoria</label>
+            <select class="input-style" id="ndCategories" name="ndCategories">
+              <option selected disabled>Seleccione una categoria</option>
+            </select>
+            <div class="invalid-feedback">Debe seleccionar al menos una categoria.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndAllergens">Alergenos</label>
+            <select class="input-style" id="ndAllergens" name="ndAllergens">
+              <option selected disabled>Seleccione un alérgeno</option>
+            </select>
+            <div class="invalid-feedback">Debe seleccionar al menos un alergeno.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+      </form>
+      `
+    );
+    // Añadimos el contendor donde iran la lista de los platos
+    container.insertAdjacentHTML(
+      "beforeend",
+      '<div id="remove-dishlist" class="container my-3"><div class="row"></div></div>'
+    );
+
+    // Añadimos el formulario a nuestra pagina
+    this.main.append(container);
+
+    // Obtenemos el selector donde iran nuestro alergenos para añadirlos
+    const allergensSelector = document.getElementById("ndAllergens");
+
+    // Recorremos los alergenos que nos llegan
+    // y las añadimos a nuestro selector de alergenos
+    for (const allergen of allergens) {
+      allergensSelector.insertAdjacentHTML(
+        "beforeend",
+        `
+          <option value='${allergen.name}'>${allergen.name}</option>
+        `
+      );
+    }
+
+    // Obtenemos el selector donde iran nuestras categorias
+    const categoySelector = document.getElementById("ndCategories");
+
+    // Recorremos las categorias y las añadimos a nuestro selector de categorias
+    for (const category of categories) {
+      categoySelector.insertAdjacentHTML(
+        "beforeend",
+        `
+          <option value='${category.name}'>${category.name}</option>
+        `
+      );
+    }
+  }
+  // Mostramos el listado de los productos para eliminarlos
+  showRemoveDishList(dishes) {
+    // Obtenemos el contenedor donde pondremos nuestros platos
+    const dishContainer = document
+      .getElementById("remove-dishlist")
+      .querySelector("div.row");
+    // Remplazamos el contenido de nuestro div
+    dishContainer.replaceChildren();
+
+    // Creamos un boolean que nos indicara si existen platos o no
+    let existDish = false;
+
+    // Iteramos sobre los platos
+    for (const dish of dishes) {
+      existDish = true;
+      // Añadimos los platos al contenedor
+      dishContainer.insertAdjacentHTML(
+        "beforeend",
+        `
+        <div class="card black rounded-3 mr-10 style-card">${dish.name}
+            <div class="card-body text-center">
+                <p class="card-text text-white">${dish.name}</p>
+            </div>
+            <div class="mt-4 mb-4 mx-auto">
+              <a href='#remove-dish' data-dish="${dish.name}" class="btn justify-content-center button red">Eliminar</a>
+            </div>
+        </div>
+        `
+      );
+    }
+
+    // Si no existen platos unicamente podremos un mensaje
+    if (!existDish) {
+      dishContainer.insertAdjacentHTML(
+        "beforeend",
+        `
+          <p class="letter_red">No existen platos para esta categoría o alérgeno</p>
+        `
+      );
+    }
+  }
+
+  // Asignaremos un plato al menu
+  showAssignDishForm(menus, dishes) {
+    // Primero borraremos el contenido del main
+    this.categories.replaceChildren();
+    this.main.replaceChildren();
+    if (this.categories.children.length > 1)
+      this.categories.children[1].remove();
+
+    // Creamos el div donde ira nuestro formulario de creacion del plato
+    const container = document.createElement("div");
+
+    // Le añadimos las clases y las ids correspondientes a nuestro contenedor
+    container.classList.add("container", "my-3");
+    container.id = "assign-dish";
+
+    // Le añadimos el titulo a nuestro contenedor
+    container.insertAdjacentHTML(
+      "afterbegin",
+      "<h1>Asignación de plato a menú</h1>"
+    );
+
+    // Añadimos el formulario para la creacion del plato a nuestro contenedor
+    container.insertAdjacentHTML(
+      "beforeend",
+      `     
+      <form name="fAssignDish" role="form" id="fAssignDish" class="booking_frm black"  novalidate> 
+        <h2 class="frm_title">Asignación Del Plato a Menú</>
+        <h3 class="frm_subtitle">Rellene los campos con la información necesaria para la asignación del plato.</h3>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndMenus">Menus <span class="letter_red">*</span></label>
+            <select class="input-style" id="ndMenus" name="ndMenus"  size="3" required>
+            </select>
+            <div class="invalid-feedback">Debe seleccionar un menu.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndDishes">Platos <span class="letter_red">*</span></label>
+            <select class="input-style" id="ndDishes" name="ndDishes" size="4" multiple required>
+            </select>
+            <div class="invalid-feedback">Debe seleccionar al menos un plato.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <button class="button red" type="submit">Enviar</button>
+          <button class="button red" type="reset">Cancelar</button>
+        </div>
+      </form>
+      `
+    );
+
+    // Añadimos el formulario a nuestra pagina
+    this.main.append(container);
+
+    const menuSelector = document.getElementById("ndMenus");
+
+    // Recorremos los menus que nos llegan
+    // y las añadimos a nuestro selector de menus
+    for (const menu of menus) {
+      menuSelector.insertAdjacentHTML(
+        "beforeend",
+        `
+           <option value='${menu.name}'>${menu.name}</option>
+         `
+      );
+    }
+    // Obtenemos el selector donde iran nuestro menus
+    const dishesSelector = document.getElementById("ndDishes");
+
+    // Recorremos los menus que nos llegan
+    // y las añadimos a nuestro selector de menus
+    for (const dish of dishes) {
+      dishesSelector.insertAdjacentHTML(
+        "beforeend",
+        `
+             <option value='${dish.name}'>${dish.name}</option>
+           `
+      );
+    }
+  }
+
+  showDesAssignDishForm(menus, dishes) {
+    // Primero borraremos el contenido del main
+    this.categories.replaceChildren();
+    this.main.replaceChildren();
+    if (this.categories.children.length > 1)
+      this.categories.children[1].remove();
+
+    // Creamos el div donde ira nuestro formulario de creacion del plato
+    const container = document.createElement("div");
+
+    // Le añadimos las clases y las ids correspondientes a nuestro contenedor
+    container.classList.add("container", "my-3");
+    container.id = "desassign-dish";
+
+    // Le añadimos el titulo a nuestro contenedor
+    container.insertAdjacentHTML(
+      "afterbegin",
+      "<h1>Desasignación de plato a menú</h1>"
+    );
+
+    // Añadimos el formulario para la creacion del plato a nuestro contenedor
+    container.insertAdjacentHTML(
+      "beforeend",
+      `     
+      <form name="fDesAssignDish" role="form" id="fDesAssignDish" class="booking_frm black"  novalidate> 
+        <h2 class="frm_title">Desasignación plato al menú</>
+        <h3 class="frm_subtitle">Rellene los campos con la información necesaria para la desasignación del plato.</h3>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndMenus">Menus <span class="letter_red">*</span></label>
+            <select class="input-style" id="ndMenus" name="ndMenus"  size="3" required>
+            </select>
+            <div class="invalid-feedback">Debe seleccionar un menu.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <div class="input-group">
+            <label for="ndDishes">Platos <span class="letter_red">*</span></label>
+            <select class="input-style" id="ndDishes" name="ndDishes" size="4" multiple required>
+            </select>
+            <div class="invalid-feedback">Debe seleccionar al menos un plato.</div>
+            <div class="valid-feedback">Correcto.</div>
+          </div>
+        </div>
+
+        <div class="mt-4">
+          <button class="button red" type="submit">Enviar</button>
+          <button class="button red" type="reset">Cancelar</button>
+        </div>
+      </form>
+      `
+    );
+
+    // Añadimos el formulario a nuestra pagina
+    this.main.append(container);
+
+    // Obtenemos el selector donde iran nuestro menus
+    const menuSelector = document.getElementById("ndMenus");
+
+    // Recorremos los menus que nos llegan
+    // y las añadimos a nuestro selector de menus
+    for (const menu of menus) {
+      menuSelector.insertAdjacentHTML(
+        "beforeend",
+        `
+            <option value='${menu.name}'>${menu.name}</option>
+          `
+      );
+    }
+
+    // Obtenemos el selector donde iran nuestro menus
+    const dishesSelector = document.getElementById("ndDishes");
+
+    // Recorremos los menus que nos llegan
+    // y las añadimos a nuestro selector de menus
+    for (const dish of dishes) {
+      dishesSelector.insertAdjacentHTML(
+        "beforeend",
+        `
+             <option value='${dish.name}'>${dish.name}</option>
+           `
+      );
+    }
+  }
+
+  bindAdminMenu(newDish, removeDish, assignDish, desssingDish) {
+    const newDishLink = document.getElementById("newCategory");
+    newDishLink.addEventListener("click", (event) => {
+      this[EXCECUTE_HANDLER](
+        newDish,
+        [],
+        "#new-category",
+        { action: "newCategory" },
+        "#",
+        event
+      );
+    });
+
+    const removeDishLink = document.getElementById("removeDish");
+    removeDishLink.addEventListener("click", (event) => {
+      this[EXCECUTE_HANDLER](
+        removeDish,
+        [],
+        "#remove-dish",
+        { action: "removeDish" },
+        "#",
+        event
+      );
+    });
+
+    const assignDishLink = document.getElementById("assignDish");
+    assignDishLink.addEventListener("click", (event) => {
+      this[EXCECUTE_HANDLER](
+        assignDish,
+        [],
+        "#assignDish",
+        { action: "assignDish" },
+        "#",
+        event
+      );
+    });
+
+    const deassignDishLink = document.getElementById("desAssignDish");
+    deassignDishLink.addEventListener("click", (event) => {
+      this[EXCECUTE_HANDLER](
+        desssingDish,
+        [],
+        "#desAssignDish",
+        { action: "desAssignDish" },
+        "#",
+        event
+      );
+    });
+  }
+
+  // Este bind se activará cuuando seleccionemos en un select de un formulario
+  bindRemoveDishSelect(allergens, categories) {
+    // Recogemos el select de alergenos
+    const ndAllergens = document.getElementById("ndAllergens");
+    ndAllergens.addEventListener("change", (event) => {
+      this[EXCECUTE_HANDLER](
+        allergens,
+        [event.currentTarget.value],
+        "#remove-dish",
+        { action: "removeDishByAllergen", allergen: event.currentTarget.value },
+        "#remove-dish",
+        event
+      );
+    });
+
+    // Recogemos el select de categorias
+    const ndCategories = document.getElementById("ndCategories");
+    ndCategories.addEventListener("change", (event) => {
+      this[EXCECUTE_HANDLER](
+        categories,
+        [event.currentTarget.value],
+        "#remove-dish",
+        { action: "removeDishByCategory", category: event.currentTarget.value },
+        "#remove-dish",
+        event
+      );
+    });
+  }
+
+  // Bind para la eliminacion de platos
+  bindRemoveDish(handler) {
+    // Recogemos el contenedor donde tenemos los platos
+    const dishList = document.getElementById("remove-dish");
+    // Recogemos los botones de eliminar
+    const buttons = dishList.querySelectorAll("a");
+    // Iteramos sobre los botones
+    for (const button of buttons) {
+      button.addEventListener("click", function (event) {
+        handler(this.dataset.dish);
+      });
+    }
+  }
+
+  bindNewDishForm(handler) {
+    newDishValidation(handler);
+  }
+
+  bindAssignDishForm(handler) {
+    assignValidationForm(handler);
+  }
+
+  bindDesAssignDishForm(handler) {
+    desAssignValidationForm(handler);
+  }
+
+  // MODALES
+
+  showDishModal(done, dish, error) {
+    const messageModalContainer = document.getElementById("messageModal");
+    const messageModal = new bootstrap.Modal("#messageModal");
+
+    const title = document.getElementById("messageModalTitle");
+    title.innerHTML = "Plato creada";
+    const body = messageModalContainer.querySelector(".modal-body");
+    body.replaceChildren();
+    if (done) {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="p-3">El plato <strong>${dish.name}</strong> ha sido creado correctamente.</div>`
+      );
+    } else {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="error text-danger p-3"><i class="bi bi-exclamation-triangle"></i> El plato <strong>${dish.name}</strong> se ha creado correctamente.</div>`
+      );
+    }
+    messageModal.show();
+    const listener = (event) => {
+      if (done) {
+        document.fNewDish.reset();
+      }
+      document.fNewDish.ndName.focus();
+      messageModalContainer.addEventListener("hidden.bs.modal", listener, {
+        once: true,
+      });
+    };
+  }
+  showRemoveDishModal(done, dish, error) {
+    const messageModalContainer = document.getElementById("messageModal");
+    const messageModal = new bootstrap.Modal("#messageModal");
+
+    const title = document.getElementById("messageModalTitle");
+    title.innerHTML = "Plato eliminado";
+    const body = messageModalContainer.querySelector(".modal-body");
+    body.replaceChildren();
+    if (done) {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="p-3">El plato <strong>${dish.name}</strong> ha sido eliminado correctamente.</div>`
+      );
+    } else {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        '<div class="error text-danger p-3"><i class="bi bi-exclamation-triangle"></i> El plato no existe en el manager.</div>'
+      );
+    }
+    messageModal.show();
+  }
+
+  showAssignDishModal(done, menu, error) {
+    const messageModalContainer = document.getElementById("messageModal");
+    const messageModal = new bootstrap.Modal("#messageModal");
+
+    const title = document.getElementById("messageModalTitle");
+    title.innerHTML = "Asignación plato menu";
+    const body = messageModalContainer.querySelector(".modal-body");
+    body.replaceChildren();
+    if (done) {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="p-3">Los platos han sido agregados al <strong>${menu.name}</strong>.</div>`
+      );
+    } else {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="error text-danger p-3"><i class="bi bi-exclamation-triangle"></i>El <strong>${menu.name}</strong> ya contiene alguno de los platos que esta intentando agregar.</div>`
+      );
+    }
+    messageModal.show();
+    const listener = (event) => {
+      if (done) {
+        document.fAssignDish.reset();
+      }
+      document.fAssignDish.ndMenus.focus();
+    };
+    messageModalContainer.addEventListener("hidden.bs.modal", listener, {
+      once: true,
+    });
+  }
+
+  showDesAssignDishModal(done, menu, error) {
+    const messageModalContainer = document.getElementById("messageModal");
+    const messageModal = new bootstrap.Modal("#messageModal");
+
+    const title = document.getElementById("messageModalTitle");
+    title.innerHTML = "Desasignación plato menu";
+    const body = messageModalContainer.querySelector(".modal-body");
+    body.replaceChildren();
+    if (done) {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="p-3">Los platos han sido desasignados del <strong>${menu.name}</strong>.</div>`
+      );
+    } else {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="error text-danger p-3"><i class="bi bi-exclamation-triangle"></i>El <strong>${menu.name}</strong> no contiene alguno de los platos seleccionados.</div>`
+      );
+    }
+    messageModal.show();
+    const listener = (event) => {
+      if (done) {
+        document.fDesAssignDish.reset();
+      }
+      document.fDesAssignDish.ndMenus.focus();
+    };
+    messageModalContainer.addEventListener("hidden.bs.modal", listener, {
+      once: true,
+    });
+  }
+
+  showRemoveDishModal(done, dish, error) {
+    const messageModalContainer = document.getElementById("messageModal");
+    const messageModal = new bootstrap.Modal("#messageModal");
+
+    const title = document.getElementById("messageModalTitle");
+    title.innerHTML = "Plato eliminado";
+    const body = messageModalContainer.querySelector(".modal-body");
+    body.replaceChildren();
+    if (done) {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        `<div class="p-3">El plato <strong>${dish.name}</strong> ha sido eliminado correctamente.</div>`
+      );
+    } else {
+      body.insertAdjacentHTML(
+        "afterbegin",
+        '<div class="error text-danger p-3"><i class="bi bi-exclamation-triangle"></i> El plato no existe en el manager.</div>'
+      );
+    }
+    messageModal.show();
   }
 }
 
